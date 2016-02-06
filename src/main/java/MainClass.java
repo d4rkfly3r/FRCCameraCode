@@ -28,9 +28,9 @@ public class MainClass {
                 int blue = (rgbData & 0x000000FF);
                 Color.RGBtoHSB(red, green, blue, hsb);
 
-                System.out.println((rgbData & 0x00FFFFFF) + " | " + red + " | " + green + " | " + blue + " | " + Arrays.toString(hsb));
+                if (hsb[0] > 120 && hsb[1] > 50 && hsb[2] > 60)
+                    System.out.println((rgbData & 0x00FFFFFF) + " | " + red + " | " + green + " | " + blue + " | " + Arrays.toString(hsb));
             }
         }
     }
-
 }
