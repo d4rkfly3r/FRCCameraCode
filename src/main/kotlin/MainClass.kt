@@ -2,6 +2,7 @@
  * Created by Joshua on 2/6/2016.
  */
 import com.github.sarxos.webcam.Webcam
+import net.d4.aiir.SelfOrganizingMap
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
@@ -72,8 +73,6 @@ fun main(args: Array<String>) {
     }
 
     image.filterByDensity(4);
-    //    val density: Int = 3
-    //    println()
 
     // Write [modified] BufferedImage to a file
     ImageIO.write(image, "PNG", File("test.png"))
@@ -85,6 +84,7 @@ fun BufferedImage.filterByDensity(density: Int) {
         for (y in 0..height - 1) {
             getRGBPixelsAroundPoint(x, y, density, surroundingPixels);
             for (pixel in surroundingPixels) {
+//                println((pixel))
                 if (pixel != 0x00000000) {
                     println((pixel and 0x0000FF00) shl 8)
                 }
@@ -100,7 +100,6 @@ fun BufferedImage.getRGBPixelsAroundPoint(x: Int, y: Int, density: Int, surround
             if (x1 > width - 1 || y1 > height - 1 || x1 < 0 || y1 < 0)
                 continue;
 
-//            println("$x1 | $y1")
             surroundingPixelsList.add(getRGB(x1, y1))
         }
     }

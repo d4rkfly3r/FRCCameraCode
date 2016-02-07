@@ -1,4 +1,5 @@
 import com.github.sarxos.webcam.Webcam;
+import net.d4.aiir.NormalizeInput;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,7 +12,14 @@ import java.io.IOException;
  */
 public class MainClass {
 
+
+    static NormalizeInput ni = new NormalizeInput(new double[5], NormalizeInput.NormalizationType.MULTIPLICATIVE);
+
     public static void main(String[] args) throws IOException {
+
+
+
+
         Webcam webcam = Webcam.getWebcams().get(0);
         webcam.open();
         BufferedImage image = webcam.getImage();
@@ -62,5 +70,10 @@ public class MainClass {
             }
         }
         ImageIO.write(image, "PNG", new File("test.png"));
+
+
     }
 }
+
+
+
