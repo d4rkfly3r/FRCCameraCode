@@ -5,8 +5,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.Buffer;
-import java.util.Arrays;
 
 /**
  * Created by robotics on 2/3/2016.
@@ -14,14 +12,15 @@ import java.util.Arrays;
 public class MainClass {
 
     public static void main(String[] args) throws IOException {
-//        Webcam webcam = Webcam.getWebcams().get(0);
-//        webcam.open();
-//        BufferedImage image = webcam.getImage();
-//        webcam.close();
+        Webcam webcam = Webcam.getWebcams().get(0);
+        webcam.open();
+        BufferedImage image = webcam.getImage();
+        webcam.close();
+        int[][] surroundingPixels = new int[5][5];
 
 //        BufferedImage image = ImageIO.read(new File("rainbow1.jpg"));
 //        BufferedImage image = ImageIO.read(new File("rainbow2.jpg"));
-        BufferedImage image = ImageIO.read(new File("rainbow3.png"));
+//        BufferedImage image = ImageIO.read(new File("rainbow3.png"));
         float[] hsb = new float[3];
 
 //        BufferedImage bufferedImage = image;

@@ -5,6 +5,7 @@ import com.github.sarxos.webcam.Webcam
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
+import java.util.*
 import javax.imageio.ImageIO
 
 /**
@@ -40,7 +41,6 @@ val saturationRange: Range = Range(0.15f, 1f)
  */
 val valueRange: Range = Range(0.25f, 1f)
 
-
 fun main(args: Array<String>) {
     // The BufferedImage object that will contain all the data
     val image: BufferedImage
@@ -67,21 +67,51 @@ fun main(args: Array<String>) {
     for (x in 0..image.width - 1) {
         for (y in 0..image.height - 1) {
             // Runs pixel through filter algorithm
-            image.filterPixel(x, y)
+            image.filterPixel(x, y, hueRange, saturationRange, valueRange)
         }
     }
 
+    image.filterByDensity(4);
+    //    val density: Int = 3
+    //    println()
+
     // Write [modified] BufferedImage to a file
     ImageIO.write(image, "PNG", File("test.png"))
+}
+
+fun BufferedImage.filterByDensity(density: Int) {
+    val surroundingPixels = IntArray(Math.pow((1 + (2 * density)).toDouble(), 2.0).toInt())
+    for (x in 0..width - 1) {
+        for (y in 0..height - 1) {
+            getRGBPixelsAroundPoint(x, y, density, surroundingPixels);
+            for (pixel in surroundingPixels) {
+                if (pixel != 0x00000000) {
+                    println((pixel and 0x0000FF00) shl 8)
+                }
+            }
+        }
+    }
+}
+
+fun BufferedImage.getRGBPixelsAroundPoint(x: Int, y: Int, density: Int, surroundingPixels: IntArray) {
+    val surroundingPixelsList: ArrayList<Int> = ArrayList(surroundingPixels.size + 2)
+    for (x1 in x - density..x + density) {
+        for (y1 in y - density..y + density) {
+            if (x1 > width - 1 || y1 > height - 1 || x1 < 0 || y1 < 0)
+                continue;
+
+//            println("$x1 | $y1")
+            surroundingPixelsList.add(getRGB(x1, y1))
+        }
+    }
 }
 
 /**
  * A function that takes a pixel and passes it through a HSV filter, set by the Ranges above
  * @see Range
  * @see BufferedImage
- *
  */
-fun BufferedImage.filterPixel(x: Int, y: Int) {
+fun BufferedImage.filterPixel(x: Int, y: Int, hueRange: Range, saturationRange: Range, valueRange: Range) {
     // RGB raw data (Int)
     val rgbData: Int = getRGB(x, y)
     // Red value from RGB data (Int)
@@ -111,6 +141,5 @@ fun BufferedImage.filterPixel(x: Int, y: Int) {
         // If not, sets pixels to nothing...
         setRGB(x, y, 0x00000000) // 0 shl 24 or (0 shl 16) or (green shl 8) or 0)
     }
-
 }
 
