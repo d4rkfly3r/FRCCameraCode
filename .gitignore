@@ -2,4 +2,4 @@
 .gradle
 build
 ImageRecog.iml
-test.jpg
+test.*
