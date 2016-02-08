@@ -5,7 +5,7 @@ package net.d4.aiir
  */
 public class SelfOrganizingMap(val inputCount: Int, val outputCount: Int, val normalizationType: NormalizeInput.NormalizationType) {
     companion object {
-        public val VERYSMALL: Double = Math.pow(1.0, -30.0);
+        public val VERYSMALL: Double = 1.0e-30
     }
 
     var outputWeights: Matrix = Matrix(outputCount, inputCount + 1)
@@ -21,7 +21,7 @@ public class SelfOrganizingMap(val inputCount: Int, val outputCount: Int, val no
         var biggest: Double = Double.MIN_VALUE
         for (i in 0..outputCount) {
             val optr: Matrix = outputWeights.getRow(i)
-            this.output[i] = MatrixMath.dotProduct(normalizeInput.inputMatrix!!, optr) * normalizeInput.normalizationFactor
+            this.output[i] = MatrixMath.dotProduct(normalizeInput.inputMatrix, optr) * normalizeInput.normalizationFactor
 
             this.output[i] = (this.output[i] + 1.0) / 2.0
 
