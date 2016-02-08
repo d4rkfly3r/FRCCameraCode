@@ -30,7 +30,7 @@ public class Matrix : Serializable, Cloneable {
     companion object {
         fun createColumnMatrix(input: DoubleArray): Matrix {
             val d = Array(input.size) { DoubleArray(1) }
-            for (row in d.indices) {
+            for (row in 0..d.size - 1) {
                 d[row][0] = input[row]
             }
             return Matrix(d)

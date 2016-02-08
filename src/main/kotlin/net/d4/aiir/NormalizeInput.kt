@@ -5,8 +5,6 @@ import kotlin.collections.indices
 /**
  * Created by d4rkfly3r (Joshua F.) on 2/7/16.
  */
-
-
 class NormalizeInput(val input: DoubleArray, val type: NormalizeInput.NormalizationType) {
     enum class NormalizationType {
         Z_AXIS, MULTIPLICATIVE, OTHER, ZY_AXIS
@@ -33,7 +31,7 @@ class NormalizeInput(val input: DoubleArray, val type: NormalizeInput.Normalizat
     /**
      * The input expressed as a matrix.
      */
-    public var inputMatrix: Matrix? = null
+    public var inputMatrix: Matrix = createInputMatrix(input, synth)
         get() {
             return this.inputMatrix
         }
@@ -42,11 +40,9 @@ class NormalizeInput(val input: DoubleArray, val type: NormalizeInput.Normalizat
 
     init {
         calculateFactors(input)
-        this.inputMatrix = createInputMatrix(input, synth)
     }
 
-    protected fun createInputMatrix(pattern: DoubleArray,
-                                    extra: Double): Matrix {
+    protected fun createInputMatrix(pattern: DoubleArray, extra: Double): Matrix {
         val result = Matrix(1, pattern.size + 1)
         for (i in pattern.indices) {
             result.set(0, i, pattern[i])

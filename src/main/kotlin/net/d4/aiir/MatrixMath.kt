@@ -99,7 +99,7 @@ object MatrixMath {
         val aArray = a.toPackedArray()
         val bArray = b.toPackedArray()
 
-        if (aArray.size != bArray.size()) {
+        if (aArray.size != bArray.size) {
             throw Matrix.Companion.MatrixError(
                     "To take the dot product, both matrices must be of the same length.")
         }
@@ -195,14 +195,6 @@ object MatrixMath {
         return Matrix(inverseMatrix)
     }
 
-    /**
-     * Calculate the length of a vector.
-
-     * @param v
-     * *            vector
-     * *
-     * @return Vector length.
-     */
     fun vectorLength(input: Matrix): Double {
         if (!input.isVector()) {
             throw Matrix.Companion.MatrixError(
