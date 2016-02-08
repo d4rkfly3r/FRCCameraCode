@@ -3,7 +3,7 @@ package net.d4.aiir
 /**
  * Created by d4rkfly3r (Joshua F.) on 2/7/16.
  */
-class TrainSelfOrganizingMap(val selfOrganizingMap: SelfOrganizingMap, val train: Array<DoubleArray>, val learningMethod: TrainSelfOrganizingMap.LearningMethod, val learnRate: Double) {
+class TrainSelfOrganizingMap(val selfOrganizingMap: SelfOrganizingMap, val train: Array<DoubleArray>, val learningMethod: TrainSelfOrganizingMap.LearningMethod, var learnRate: Double) {
     enum class LearningMethod {
         ADDITIVE,
         SUBTRACTIVE
@@ -11,14 +11,16 @@ class TrainSelfOrganizingMap(val selfOrganizingMap: SelfOrganizingMap, val train
 
     protected var reduction: Double = 0.99
     protected var globalError: Double = 0.0
-    protected var totalError: Double = 1.0
     protected val outputCount: Int = selfOrganizingMap.outputCount
     protected val inputCount: Int = selfOrganizingMap.inputCount
     protected val bestNetwork: SelfOrganizingMap = SelfOrganizingMap(inputCount, outputCount, selfOrganizingMap.normalizationType)
     protected val won: IntArray = IntArray(outputCount)
     protected val correctionMatrix: Matrix = Matrix(outputCount, inputCount + 1)
     protected var workMatrix: Matrix? = if (learningMethod == LearningMethod.ADDITIVE) Matrix(1, inputCount + 1) else null
-    protected var bestError: Double = 0.0
+    public var totalError: Double = 1.0
+        private set
+    public var bestError: Double = 0.0
+        private set
 
     init {
         for (tset in 0..train.size - 1) {
@@ -124,7 +126,76 @@ class TrainSelfOrganizingMap(val selfOrganizingMap: SelfOrganizingMap, val train
 
             globalError = Math.sqrt(globalError)
         }
-
-
     }
+
+    protected fun forceWin() {
+        var best: Int
+        var which: Int = 0
+
+        val outputWeights: Matrix = selfOrganizingMap.outputWeights
+
+        // Loop over all training sets.  Find the training set with
+        // the least output.
+        var dist: Double = Double.MAX_VALUE
+        for (tset in 0..this.train.size - 1) {
+            best = selfOrganizingMap.winner(this.train[tset])
+            val output = selfOrganizingMap.output
+
+            if (output[best] < dist) {
+                dist = output[best]
+                which = tset
+            }
+        }
+
+        val input: NormalizeInput = NormalizeInput(this.train[which], selfOrganizingMap.normalizationType)
+        best = selfOrganizingMap.winner(input)
+        val output: DoubleArray = selfOrganizingMap.output
+
+        dist = Double.MIN_VALUE
+        var i: Int = this.outputCount
+        while ((i--) > 0) {
+            if (this.won[i] !== 0) {
+                continue
+            }
+            if (output[i] > dist) {
+                dist = output[i]
+                which = i
+            }
+        }
+
+        for (j in 0..input.inputMatrix.getCols() - 1) {
+            outputWeights.set(which, j, input.inputMatrix[0, j])
+        }
+
+        normalizeWeight(outputWeights, which)
+    }
+
+    fun iteration() {
+        evaluateErrors()
+
+        totalError = globalError
+
+        if (totalError < bestError) {
+            bestError = totalError
+            copyWeights(selfOrganizingMap, bestNetwork)
+        }
+
+        var winners: Int = 0
+        for (i in 0..won.size - 1) {
+            if (won[i] != 0) {
+                winners++
+            }
+        }
+        if (winners < outputCount && winners < train.size) {
+            forceWin()
+            return
+        }
+
+        adjustWeights()
+
+        if (learnRate > 0.01) {
+            learnRate *= reduction
+        }
+    }
+
 }
