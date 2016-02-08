@@ -64,6 +64,14 @@ fun main(args: Array<String>) {
         }
     }
 
+    var t1 = image.compareTo(ImageIO.read(File("rainbow6.png")))
+    var t2 = image.compareTo(ImageIO.read(File("rainbow3.png")))
+    println("T1: $t1 | T2: $t2")
+    //    image.compareTo(ImageIO.read(File("rainbow5.jpg")))
+    ImageIO.write(image, "PNG", File("test.png"))
+
+    if (true) return
+
     // Iterate over every pixel
     for (x in 0..image.width - 1) {
         for (y in 0..image.height - 1) {
@@ -78,13 +86,25 @@ fun main(args: Array<String>) {
     ImageIO.write(image, "PNG", File("test.png"))
 }
 
+fun BufferedImage.compareTo(other: BufferedImage): Double {
+    var success: Int = 0
+    for (x in 0..width - 1) {
+        for (y in 0..height - 1) {
+            if (getRGB(x, y) == other.getRGB(x, y)) {
+                success++
+            }
+        }
+    }
+    return (success.toDouble() / (width * height)) * 100
+}
+
 fun BufferedImage.filterByDensity(density: Int) {
     val surroundingPixels = IntArray(Math.pow((1 + (2 * density)).toDouble(), 2.0).toInt())
     for (x in 0..width - 1) {
         for (y in 0..height - 1) {
             getRGBPixelsAroundPoint(x, y, density, surroundingPixels);
             for (pixel in surroundingPixels) {
-//                println((pixel))
+                //                println((pixel))
                 if (pixel != 0x00000000) {
                     println((pixel and 0x0000FF00) shl 8)
                 }

@@ -1,7 +1,6 @@
 package net.d4.aiir
 
 import java.io.Serializable
-import kotlin.collections.indices
 
 /**
  * Created by d4rkfly3r (Joshua F.) on 2/7/16.
@@ -9,12 +8,9 @@ import kotlin.collections.indices
 public class Matrix : Serializable, Cloneable {
 
     var matrix: Array<DoubleArray> = Array(1) { DoubleArray(1) }
-    var sourceMatrix: Array<DoubleArray> = Array(1) { DoubleArray(1) }
 
     constructor(sourceMatrix: Array<DoubleArray>) {
         this.matrix = Array(sourceMatrix.size) { DoubleArray(sourceMatrix[0].size) }
-        val temp: Matrix = Matrix(Array(1) { DoubleArray(1) })
-        temp.set(1, 1, 1.0)
         for (r in 0..getRows() - 1) {
             for (c in 0..getCols() - 1) {
                 this.set(r, c, sourceMatrix[r][c])

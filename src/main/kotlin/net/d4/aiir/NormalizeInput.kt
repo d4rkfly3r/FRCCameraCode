@@ -14,27 +14,18 @@ class NormalizeInput(val input: DoubleArray, val type: NormalizeInput.Normalizat
      * The normalization factor.
      */
     public var normalizationFactor: Double = 0.0
-        get() {
-            return this.normalizationFactor
-        }
         private set
 
     /**
      * The synthetic input.
      */
     public var synth: Double = 0.0
-        get() {
-            return this.synth
-        }
         private set
 
     /**
      * The input expressed as a matrix.
      */
     public var inputMatrix: Matrix = createInputMatrix(input, synth)
-        get() {
-            return this.inputMatrix
-        }
         private set
 
 
@@ -74,3 +65,5 @@ class NormalizeInput(val input: DoubleArray, val type: NormalizeInput.Normalizat
 
     }
 }
+
+
