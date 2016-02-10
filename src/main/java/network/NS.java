@@ -1,25 +1,35 @@
 package network;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import network.packets.Packet;
+
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
-public class NS {
+public class NS extends Thread implements Runnable {
 
     private static Socket serverConnection = null;
-    private static BlockingQueue<NSData> dataQueue = new LinkedBlockingQueue<NSData>();
+    private static BlockingQueue<Packet> dataQueue = new LinkedBlockingQueue<Packet>();
+    private static ObjectOutputStream os = null;
 
-    public static <T extends NSData> void addQueue(T t, NS.Type type, Consumer<Object> success, Consumer<Object> failure) {
+    @Override
+    public void run() {
+        while (true) {
+            fireData(null, System.err::println);
+        }
+    }
+
+    public synchronized static <T extends Packet> void addQueue(T t, Consumer<Object> success, Consumer<Object> failure) {
         dataQueue.add(t);
     }
 
-    public static void connect(Consumer<Object> success, Consumer<Object> failure) {
+    public synchronized static void connect(Consumer<Object> success, Consumer<Object> failure) {
         try {
             serverConnection = new Socket("localhost", 7093);
             serverConnection.setKeepAlive(true);
+            os = new ObjectOutputStream(serverConnection.getOutputStream());
         } catch (Exception e) {
             if (failure != null) {
                 failure.accept(e.getMessage());
@@ -35,10 +45,10 @@ public class NS {
 
     public synchronized static void fireData(Consumer<Object> success, Consumer<Object> failure) {
         try {
-            OutputStream os = serverConnection.getOutputStream();
             if (!dataQueue.isEmpty()) {
-                NSData t = dataQueue.poll();
-                os.write(t.getData());
+                Packet t = dataQueue.poll();
+                os.writeObject(t);
+                os.flush();
             }
         } catch (Exception e) {
             if (failure != null) {
@@ -53,7 +63,7 @@ public class NS {
         }
     }
 
-    public static void close(Consumer<Object> success, Consumer<Object> failure) {
+    public synchronized static void close(Consumer<Object> success, Consumer<Object> failure) {
         try {
             serverConnection.getOutputStream().close();
             serverConnection.getInputStream().close();
@@ -70,9 +80,5 @@ public class NS {
             success.accept(null);
         }
 
-    }
-
-    public enum Type {
-        MESSAGE, JSON, SERIALIZED, UNKNOWN
     }
 }
