@@ -19,4 +19,10 @@ public class Packet01 extends Packet<Packet01> {
     public String getExtra() {
         return extra;
     }
+
+    @Override
+    public void handle() {
+        System.out.println(extra);
+        super.handle();
+    }
 }

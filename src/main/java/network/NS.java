@@ -1,6 +1,8 @@
 package network;
 
 import network.packets.Packet;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -11,7 +13,7 @@ import java.util.function.Consumer;
 public class NS extends Thread implements Runnable {
 
     private static Socket serverConnection = null;
-    private static BlockingQueue<Packet> dataQueue = new LinkedBlockingQueue<Packet>();
+    private static BlockingQueue<Node<Packet, Consumer<Object>, Consumer<Object>>> dataQueue = new LinkedBlockingQueue<>();
     private static ObjectOutputStream os = null;
 
     @Override
@@ -22,7 +24,7 @@ public class NS extends Thread implements Runnable {
     }
 
     public synchronized static <T extends Packet> void addQueue(T t, Consumer<Object> success, Consumer<Object> failure) {
-        dataQueue.add(t);
+        dataQueue.add(new Node(t, success, failure));
     }
 
     public synchronized static void connect(Consumer<Object> success, Consumer<Object> failure) {
@@ -46,9 +48,20 @@ public class NS extends Thread implements Runnable {
     public synchronized static void fireData(Consumer<Object> success, Consumer<Object> failure) {
         try {
             if (!dataQueue.isEmpty()) {
-                Packet t = dataQueue.poll();
-                os.writeObject(t);
-                os.flush();
+                Node<Packet, Consumer<Object>, Consumer<Object>> node = dataQueue.poll();
+                try {
+                    os.writeObject(node.packet);
+                    os.flush();
+                    if (node.success != null) {
+                        node.success.accept(null);
+                    }
+                } catch (Exception e) {
+                    if (node.failure != null) {
+                        node.failure.accept(e);
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
             }
         } catch (Exception e) {
             if (failure != null) {
@@ -79,6 +92,17 @@ public class NS extends Thread implements Runnable {
         if (success != null) {
             success.accept(null);
         }
+    }
 
+    static class Node<T, S, E> {
+        T packet;
+        S success;
+        E failure;
+
+        public Node(@NotNull T packet, @Nullable S success, @Nullable E failure) {
+            this.packet = packet;
+            this.success = success;
+            this.failure = failure;
+        }
     }
 }

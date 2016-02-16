@@ -3,7 +3,8 @@ package network.packets;
 import java.io.Serializable;
 
 /**
- * Created by robotics on 2/8/2016.
+ * Created by Joshua on 2/8/2016.
+ * Project: ImageRecog
  */
 public abstract class Packet<T extends Packet> implements Serializable {
 
@@ -25,4 +26,7 @@ public abstract class Packet<T extends Packet> implements Serializable {
         MESSAGE, JSON, SERIALIZED, UNKNOWN
     }
 
+    public void handle() {
+
+    }
 }

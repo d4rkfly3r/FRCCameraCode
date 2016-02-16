@@ -3,7 +3,7 @@
  */
 package network
 
-import network.packets.Packet01
+import network.packets.Packet
 import java.io.EOFException
 import java.io.IOException
 import java.io.ObjectInputStream
@@ -29,10 +29,8 @@ class MainServer {
                         while (client.isConnected) {
                             try {
                                 val unknown = objectInputStream.readObject()
-                                when (unknown) {
-                                    is Packet01 -> {
-                                        println("R: Packet 1 | ${unknown.dataType} | ${unknown.extra}")
-                                    }
+                                if (unknown is Packet<*>) {
+                                    unknown.handle()
                                 }
                             } catch (ex: EOFException) {
 
@@ -47,16 +45,13 @@ class MainServer {
                     e.printStackTrace()
                     break
                 }
-
             }
         } catch (e: IOException) {
             e.printStackTrace()
         }
-
     }
 
     companion object {
-
         @JvmStatic fun main(args: Array<String>) {
             MainServer()
         }
