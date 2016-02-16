@@ -4,14 +4,12 @@ import network.packets.Packet;
 
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 public class NS extends Thread implements Runnable {
 
     private static Socket serverConnection = null;
-    private static BlockingQueue<Packet> dataQueue = new LinkedBlockingQueue<Packet>();
+    private static ConsumerBlockingQueue<Packet, Consumer<Object>, Consumer<Object>> dataQueue = new ConsumerBlockingQueue<>();
     private static ObjectOutputStream os = null;
 
     @Override
@@ -22,7 +20,7 @@ public class NS extends Thread implements Runnable {
     }
 
     public synchronized static <T extends Packet> void addQueue(T t, Consumer<Object> success, Consumer<Object> failure) {
-        dataQueue.add(t);
+        dataQueue.add(t, success, failure);
     }
 
     public synchronized static void connect(Consumer<Object> success, Consumer<Object> failure) {
