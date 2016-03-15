@@ -1,6 +1,8 @@
 .gradle
 build
 ImageRecog.iml
+test.jpg
+.xml
 test.*
 *.log
 .idea/
